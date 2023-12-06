@@ -8,8 +8,6 @@ function getNumWaysToWin(time_avail, record_dist) {
    // as the first point is from the beginning
    return (time_avail - zero_point_1 - 1) - zero_point_1;
 }
-
-const { warn } = require('console');
 // --------------------------------------
 const fs = require('fs');
 
