@@ -45,21 +45,46 @@ function cycle(map: string[]): string[] {
    return tmp;
 }
 
-const map: string[] = fs.readFileSync("input2.txt", "utf-8").split("\n").filter(l => l.length);
+function hash(s: string): number {
+  return s.split("").reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+}
+
+const map: string[] = fs.readFileSync("input.txt", "utf-8").split("\n").filter(l => l.length);
 
 let tmp = [...map];
 
-tmp = cycle(tmp);
-print_map(tmp);
-tmp = cycle(tmp);
-print_map(tmp);
-tmp = cycle(tmp);
-print_map(tmp);
+let cycle_start = 0;
+let cycle_len = 0;
+let cycle_cnt = 0;
+let hashes: Object = {};
+while (true) {
+   tmp = cycle(tmp);
+   ++cycle_cnt;
 
+   const the_hash = hash(tmp.join('\n'));
+   if (hashes.hasOwnProperty(the_hash)) {
+      cycle_start = hashes[the_hash];
+      cycle_len = cycle_cnt - cycle_start;
+      break; 
+   }
+   hashes[the_hash] = cycle_cnt;
+}
 
-/*
-const total_load = map
+console.log(`Detected cycle starting at ${cycle_start} of length ${cycle_len}`);
+
+const effective_cnt = (1_000_000_000 - cycle_start) % cycle_len;
+
+console.log(`Must run ${cycle_start + effective_cnt} times to get the result`);
+
+tmp = [...map];
+for (let i = 0; i < cycle_start + effective_cnt; ++i) {
+   tmp = cycle(tmp);
+}
+
+const total_load = tmp
    .map(l => (l.match(/O/g) || []).length)
    .reduce((acc,x,idx) => acc + (x * (map.length - idx)), 0);
 console.log("Total load = ", total_load);
-*/
